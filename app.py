@@ -26,6 +26,33 @@ API_KEY = st.secrets["FOOTBALL_DATA_API_KEY"]
 headers = {
     "X-Auth-Token": API_KEY
 }
+API_TO_MODEL_TEAM = {
+    "Arsenal FC": "Arsenal",
+    "Aston Villa FC": "Aston Villa",
+    "AFC Bournemouth": "Bournemouth",
+    "Brentford FC": "Brentford",
+    "Brighton & Hove Albion FC": "Brighton",
+    "Burnley FC": "Burnley",
+    "Chelsea FC": "Chelsea",
+    "Crystal Palace FC": "Crystal Palace",
+    "Everton FC": "Everton",
+    "Fulham FC": "Fulham",
+    "Leeds United FC": "Leeds",
+    "Liverpool FC": "Liverpool",
+    "Manchester City FC": "Man City",
+    "Manchester United FC": "Man United",
+    "Newcastle United FC": "Newcastle",
+    "Nottingham Forest FC": "Nott'm Forest",
+    "Sunderland AFC": "Sunderland",
+    "Tottenham Hotspur FC": "Tottenham",
+    "West Ham United FC": "West Ham",
+    "Wolverhampton Wanderers FC": "Wolves",
+
+    "Coventry City FC": "Coventry",
+    "Hull City AFC": "Hull",
+    "Ipswich Town FC": "Ipswich"
+}
+
 # ===================================================
 # TEAM LOGOS
 # ===================================================
