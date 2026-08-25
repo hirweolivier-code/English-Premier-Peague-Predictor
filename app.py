@@ -616,18 +616,18 @@ if st.button("Predict Match"):
 
         if prediction == "H":
 
-    result_text = (
-        f"🏆 {home_team} Win"
-    )
+            result_text = (
+                f"🏆 {home_team} Win"
+            )
         elif prediction == "A":
 
-    result_text = (
-        f"🏆 {away_team} Win"
-    )
+              result_text = (
+                  f"🏆 {away_team} Win"
+              )
 
         else:
 
-    result_text = "🤝 Draw"
+            result_text = "🤝 Draw"
 
        st.success(
             f"Predicted Result: {result_text}"
