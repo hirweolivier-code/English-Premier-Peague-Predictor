@@ -749,6 +749,6 @@ try:
            )
 except Exception as e:
 
-    st.error(
+      st.error(
         "Could not load upcoming Premier League fixtures."
     )
