@@ -622,7 +622,7 @@ if st.button("Predict Match"):
 
         with col_vs:
             st.markdown("<h2 style='text-align:center; margin-top:25px;'>VS</h2>",
-                unsafe_allow_html=True")
+                unsafe_allow_html=True)
 
         with col_away:
             if away_team in team_logos:
