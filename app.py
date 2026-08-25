@@ -626,7 +626,7 @@ if st.button("Predict Match"):
 
         with col_vs:
             st.markdown(
-                "<div style='text-align:left; "
+                "<div style='text-align:center; "
                 "font-size:30px; font-weight:700; "
                 "padding-top:35px;'>VS</div>",
                 unsafe_allow_html=True
