@@ -609,7 +609,7 @@ if st.button("Predict Match"):
             key=prob_dict.get
         )
 
-        col_home, col_vs, spacer, col_away = st.columns([1.8, 0.4,0.35, 1.8])
+        col_home, col_vs, spacer, col_away = st.columns([1.8, 0.4,0.7, 1.8])
 
         with col_home:
             if home_team in team_logos:
