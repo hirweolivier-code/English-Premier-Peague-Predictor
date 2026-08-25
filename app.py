@@ -1,0 +1,638 @@
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import joblib
+
+# ============================================================
+# LOAD MODEL AND DATA
+# ============================================================
+
+project_path = "/content/drive/MyDrive/Football_Prediction"
+
+final_elo_model = joblib.load(
+    f"{project_path}/final_elo_model.pkl"
+)
+
+features_elo40 = joblib.load(
+    f"{project_path}/features_elo40.pkl"
+)
+
+football = pd.read_pickle(
+    f"{project_path}/football_processed.pkl"
+)
+
+
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def resolve_team_name(team, df):
+
+    teams = pd.unique(
+        pd.concat([
+            df["HomeTeam"],
+            df["AwayTeam"]
+        ])
+    )
+
+    matches = [
+        t for t in teams
+        if t.lower().strip() == team.lower().strip()
+    ]
+
+    if len(matches) == 1:
+        return matches[0]
+
+    if len(matches) == 0:
+        raise ValueError(
+            f"Team '{team}' not found in dataset."
+        )
+
+    raise ValueError(
+        f"Multiple matches found for '{team}': {matches}"
+    )
+
+
+def previous_5_form(team, current_index, df):
+
+    previous_matches = df.iloc[:current_index]
+
+    team_matches = previous_matches[
+        (previous_matches["HomeTeam"] == team) |
+        (previous_matches["AwayTeam"] == team)
+    ].tail(5)
+
+    points = 0
+
+    for _, match in team_matches.iterrows():
+
+        if match["HomeTeam"] == team:
+
+            if match["FTR"] == "H":
+                points += 3
+
+            elif match["FTR"] == "D":
+                points += 1
+
+        else:
+
+            if match["FTR"] == "A":
+                points += 3
+
+            elif match["FTR"] == "D":
+                points += 1
+
+    return points
+
+
+def previous_5_goal_stats(team, current_index, df):
+
+    previous_matches = df.iloc[:current_index]
+
+    team_matches = previous_matches[
+        (previous_matches["HomeTeam"] == team) |
+        (previous_matches["AwayTeam"] == team)
+    ].tail(5)
+
+    goals_for = []
+    goals_against = []
+
+    for _, match in team_matches.iterrows():
+
+        if match["HomeTeam"] == team:
+
+            goals_for.append(match["FTHG"])
+            goals_against.append(match["FTAG"])
+
+        else:
+
+            goals_for.append(match["FTAG"])
+            goals_against.append(match["FTHG"])
+
+    if len(team_matches) == 0:
+        return 0, 0
+
+    return (
+        np.mean(goals_for),
+        np.mean(goals_against)
+    )
+
+
+def previous_5_location_form(team, current_index, df, location):
+
+    previous_matches = df.iloc[:current_index]
+
+    if location == "home":
+
+        matches = previous_matches[
+            previous_matches["HomeTeam"] == team
+        ].tail(5)
+
+        points = 0
+
+        for _, match in matches.iterrows():
+
+            if match["FTR"] == "H":
+                points += 3
+
+            elif match["FTR"] == "D":
+                points += 1
+
+    else:
+
+        matches = previous_matches[
+            previous_matches["AwayTeam"] == team
+        ].tail(5)
+
+        points = 0
+
+        for _, match in matches.iterrows():
+
+            if match["FTR"] == "A":
+                points += 3
+
+            elif match["FTR"] == "D":
+                points += 1
+
+    return points
+
+
+def future_season_ppg(team, season, df):
+
+    season_matches = df[
+        df["Season"] == season
+    ]
+
+    team_matches = season_matches[
+        (season_matches["HomeTeam"] == team)
+        |
+        (season_matches["AwayTeam"] == team)
+    ]
+
+    if len(team_matches) == 0:
+
+        team_history = df[
+            (df["HomeTeam"] == team)
+            |
+            (df["AwayTeam"] == team)
+        ]
+
+        if len(team_history) == 0:
+            return 0.0
+
+        latest_season = team_history.iloc[-1]["Season"]
+
+        season_matches = df[
+            df["Season"] == latest_season
+        ]
+
+        team_matches = season_matches[
+            (season_matches["HomeTeam"] == team)
+            |
+            (season_matches["AwayTeam"] == team)
+        ]
+
+    if len(team_matches) == 0:
+        return 0.0
+
+    points = 0
+
+    for _, match in team_matches.iterrows():
+
+        if match["HomeTeam"] == team:
+
+            if match["FTR"] == "H":
+                points += 3
+
+            elif match["FTR"] == "D":
+                points += 1
+
+        else:
+
+            if match["FTR"] == "A":
+                points += 3
+
+            elif match["FTR"] == "D":
+                points += 1
+
+    return points / len(team_matches)
+
+
+def previous_5_sot(team, current_index, df):
+
+    previous_matches = df.iloc[:current_index]
+
+    team_matches = previous_matches[
+        (previous_matches["HomeTeam"] == team) |
+        (previous_matches["AwayTeam"] == team)
+    ].tail(5)
+
+    shots_on_target = []
+
+    for _, match in team_matches.iterrows():
+
+        if match["HomeTeam"] == team:
+            shots_on_target.append(match["HST"])
+
+        else:
+            shots_on_target.append(match["AST"])
+
+    if len(team_matches) == 0:
+        return 0
+
+    return np.mean(shots_on_target)
+
+
+def previous_5_sota(team, current_index, df):
+
+    previous_matches = df.iloc[:current_index]
+
+    team_matches = previous_matches[
+        (previous_matches["HomeTeam"] == team) |
+        (previous_matches["AwayTeam"] == team)
+    ].tail(5)
+
+    shots_allowed = []
+
+    for _, match in team_matches.iterrows():
+
+        if match["HomeTeam"] == team:
+            shots_allowed.append(match["AST"])
+
+        else:
+            shots_allowed.append(match["HST"])
+
+    if len(team_matches) == 0:
+        return 0
+
+    return np.mean(shots_allowed)
+
+
+def future_season_strength(team, season, df):
+
+    previous = df[
+        df["Season"] == season
+    ]
+
+    team_matches = previous[
+        (previous["HomeTeam"] == team)
+        |
+        (previous["AwayTeam"] == team)
+    ]
+
+    if len(team_matches) == 0:
+
+        team_history = df[
+            (df["HomeTeam"] == team)
+            |
+            (df["AwayTeam"] == team)
+        ]
+
+        if len(team_history) == 0:
+            return 1.0, 1.0
+
+        latest_season = team_history.iloc[-1]["Season"]
+
+        previous = df[
+            df["Season"] == latest_season
+        ]
+
+        team_matches = previous[
+            (previous["HomeTeam"] == team)
+            |
+            (previous["AwayTeam"] == team)
+        ]
+
+    if len(team_matches) == 0:
+        return 1.0, 1.0
+
+    goals_for = 0
+    goals_against = 0
+
+    for _, match in team_matches.iterrows():
+
+        if match["HomeTeam"] == team:
+
+            goals_for += match["FTHG"]
+            goals_against += match["FTAG"]
+
+        else:
+
+            goals_for += match["FTAG"]
+            goals_against += match["FTHG"]
+
+    team_gf_per_game = (
+        goals_for / len(team_matches)
+    )
+
+    team_ga_per_game = (
+        goals_against / len(team_matches)
+    )
+
+    total_goals = (
+        previous["FTHG"].sum()
+        + previous["FTAG"].sum()
+    )
+
+    league_goals_per_team_match = (
+        total_goals
+        / (2 * len(previous))
+    )
+
+    attack_strength = (
+        team_gf_per_game
+        / league_goals_per_team_match
+    )
+
+    defense_strength = (
+        team_ga_per_game
+        / league_goals_per_team_match
+    )
+
+    return attack_strength, defense_strength
+
+
+def get_current_elo_ratings(
+    df,
+    initial_rating=1500,
+    k=40
+):
+
+    ratings = {}
+
+    for _, row in df.iterrows():
+
+        home = row["HomeTeam"]
+        away = row["AwayTeam"]
+
+        home_elo = ratings.get(
+            home,
+            initial_rating
+        )
+
+        away_elo = ratings.get(
+            away,
+            initial_rating
+        )
+
+        expected_home = 1 / (
+            1 + 10 ** (
+                (away_elo - home_elo) / 400
+            )
+        )
+
+        expected_away = 1 - expected_home
+
+        if row["FTR"] == "H":
+            actual_home = 1.0
+            actual_away = 0.0
+
+        elif row["FTR"] == "A":
+            actual_home = 0.0
+            actual_away = 1.0
+
+        else:
+            actual_home = 0.5
+            actual_away = 0.5
+
+        ratings[home] = (
+            home_elo
+            + k * (actual_home - expected_home)
+        )
+
+        ratings[away] = (
+            away_elo
+            + k * (actual_away - expected_away)
+        )
+
+    return ratings
+
+
+# ============================================================
+# BUILD ALL 28 FEATURES
+# ============================================================
+
+def make_future_match_features_final(
+    home_team,
+    away_team,
+    df,
+    season=None
+):
+
+    home_team = resolve_team_name(home_team, df)
+    away_team = resolve_team_name(away_team, df)
+
+    if season is None:
+        season = df.iloc[-1]["Season"]
+
+    i = len(df)
+
+    h_form = previous_5_form(home_team, i, df)
+    a_form = previous_5_form(away_team, i, df)
+
+    h_gf, h_ga = previous_5_goal_stats(home_team, i, df)
+    a_gf, a_ga = previous_5_goal_stats(away_team, i, df)
+
+    h_home_form = previous_5_location_form(
+        home_team, i, df, "home"
+    )
+
+    a_away_form = previous_5_location_form(
+        away_team, i, df, "away"
+    )
+
+    h_ppg = future_season_ppg(
+        home_team, season, df
+    )
+
+    a_ppg = future_season_ppg(
+        away_team, season, df
+    )
+
+    h_sot = previous_5_sot(home_team, i, df)
+    a_sot = previous_5_sot(away_team, i, df)
+
+    h_sota = previous_5_sota(home_team, i, df)
+    a_sota = previous_5_sota(away_team, i, df)
+
+    h_attack, h_defense = future_season_strength(
+        home_team, season, df
+    )
+
+    a_attack, a_defense = future_season_strength(
+        away_team, season, df
+    )
+
+    elo_ratings = get_current_elo_ratings(
+        df,
+        initial_rating=1500,
+        k=40
+    )
+
+    h_elo = elo_ratings.get(home_team, 1500)
+    a_elo = elo_ratings.get(away_team, 1500)
+
+    future = pd.DataFrame([{
+
+        "HomeForm5": h_form,
+        "AwayForm5": a_form,
+
+        "HomeGF5": h_gf,
+        "HomeGA5": h_ga,
+        "AwayGF5": a_gf,
+        "AwayGA5": a_ga,
+
+        "FormDiff": h_form - a_form,
+        "AttackDiff": h_gf - a_gf,
+        "DefenseDiff": a_ga - h_ga,
+
+        "HomeHomeForm5": h_home_form,
+        "AwayAwayForm5": a_away_form,
+
+        "LocationFormDiff":
+            h_home_form - a_away_form,
+
+        "HomePPG": h_ppg,
+        "AwayPPG": a_ppg,
+        "PPGDiff": h_ppg - a_ppg,
+
+        "HomeSOT5": h_sot,
+        "AwaySOT5": a_sot,
+        "SOTDiff": h_sot - a_sot,
+
+        "HomeSOTA5": h_sota,
+        "AwaySOTA5": a_sota,
+        "SOTAllowedDiff": a_sota - h_sota,
+
+        "HomeAttackStrength": h_attack,
+        "HomeDefenseStrength": h_defense,
+
+        "AwayAttackStrength": a_attack,
+        "AwayDefenseStrength": a_defense,
+
+        "AttackStrengthDiff":
+            h_attack - a_attack,
+
+        "DefenseStrengthDiff":
+            a_defense - h_defense,
+
+        "EloDiff40":
+            h_elo - a_elo
+    }])
+
+    return future[features_elo40]
+
+
+# ============================================================
+# STREAMLIT PAGE
+# ============================================================
+
+st.set_page_config(
+    page_title="Premier League Predictor",
+    page_icon="⚽",
+    layout="centered"
+)
+
+st.title("⚽ Premier League Match Predictor")
+
+st.write(
+    "Select the home and away teams to predict the match outcome."
+)
+
+teams = sorted(
+    set(football["HomeTeam"])
+    | set(football["AwayTeam"])
+)
+
+home_team = st.selectbox(
+    "Home Team",
+    teams
+)
+
+away_team = st.selectbox(
+    "Away Team",
+    teams,
+    index=1
+)
+
+if st.button("Predict Match"):
+
+    if home_team == away_team:
+
+        st.error(
+            "Home and away teams must be different."
+        )
+
+    else:
+
+        X_future = make_future_match_features_final(
+            home_team,
+            away_team,
+            football,
+            season="2026/27"
+        )
+
+        probabilities = final_elo_model.predict_proba(
+            X_future
+        )[0]
+
+        prob_dict = dict(
+            zip(
+                final_elo_model.classes_,
+                probabilities
+            )
+        )
+
+        p_home = prob_dict["H"]
+        p_draw = prob_dict["D"]
+        p_away = prob_dict["A"]
+
+        prediction = max(
+            prob_dict,
+            key=prob_dict.get
+        )
+
+        st.subheader(
+            f"{home_team} vs {away_team}"
+        )
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric(
+                "Home Win",
+                f"{p_home * 100:.1f}%"
+            )
+
+        with col2:
+            st.metric(
+                "Draw",
+                f"{p_draw * 100:.1f}%"
+            )
+
+        with col3:
+            st.metric(
+                "Away Win",
+                f"{p_away * 100:.1f}%"
+            )
+
+        if prediction == "H":
+
+            result_text = (
+                f"🏆 {home_team} Win"
+            )
+
+        elif prediction == "A":
+
+            result_text = (
+                f"🏆 {away_team} Win"
+            )
+
+        else:
+
+            result_text = "🤝 Draw"
+
+        st.success(
+            f"Predicted Result: {result_text}"
+        )
