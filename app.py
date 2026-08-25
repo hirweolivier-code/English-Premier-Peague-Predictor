@@ -593,11 +593,11 @@ if st.button("Predict Match"):
             key=prob_dict.get
         )
 
-        st.subheader(
+st.subheader(
             f"{home_team} vs {away_team}"
         )
 
-    st.markdown("### Match probabilities")
+st.markdown("### Match probabilities")
 
 st.progress(
     float(p_home),
@@ -614,21 +614,20 @@ st.progress(
     text=f"{away_team} win — {p_away * 100:.1f}%"
 )    
 
-        if prediction == "H":
+if prediction == "H":
 
-            result_text = (
-                f"🏆 {home_team} Win"
-            )
+    result_text = (
+        f"🏆 {home_team} Win"
+    )
+elif prediction == "A":
 
-        elif prediction == "A":
+    result_text = (
+        f"🏆 {away_team} Win"
+    )
 
-            result_text = (
-                f"🏆 {away_team} Win"
-            )
+else:
 
-        else:
-
-            result_text = "🤝 Draw"
+    result_text = "🤝 Draw"
 
         st.success(
             f"Predicted Result: {result_text}"
