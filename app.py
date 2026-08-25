@@ -633,6 +633,10 @@ if st.button("Predict Match"):
             )
 
         with col_away:
+            st.markdown(
+                "<div style='padding-left:100px;'>",
+                unsafe_allow_html=True
+            )
             
             if away_team in team_logos:
                 st.image(
