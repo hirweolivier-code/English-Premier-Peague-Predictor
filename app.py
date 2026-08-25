@@ -597,25 +597,22 @@ if st.button("Predict Match"):
             f"{home_team} vs {away_team}"
         )
 
-        col1, col2, col3 = st.columns(3)
+    st.markdown("### Match probabilities")
 
-        with col1:
-            st.metric(
-                "Home Win",
-                f"{p_home * 100:.1f}%"
-            )
+st.progress(
+    float(p_home),
+    text=f"{home_team} win — {p_home * 100:.1f}%"
+)
 
-        with col2:
-            st.metric(
-                "Draw",
-                f"{p_draw * 100:.1f}%"
-            )
+st.progress(
+    float(p_draw),
+    text=f"Draw — {p_draw * 100:.1f}%"
+)
 
-        with col3:
-            st.metric(
-                "Away Win",
-                f"{p_away * 100:.1f}%"
-            )
+st.progress(
+    float(p_away),
+    text=f"{away_team} win — {p_away * 100:.1f}%"
+)    
 
         if prediction == "H":
 
