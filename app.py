@@ -619,7 +619,7 @@ if st.button("Predict Match"):
                 )
 
             st.markdown(
-                f"<div style='text-align:center; font-size:24px; font-weight:700;'>"
+                f"<div style='text-align:left; font-size:24px; font-weight:700;'>"
                 f"{home_team}</div>",
                 unsafe_allow_html=True
             )
