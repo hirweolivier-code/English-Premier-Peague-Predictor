@@ -1,4 +1,4 @@
-
+import requests
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -21,7 +21,11 @@ features_elo40 = joblib.load(
 football = pd.read_pickle(
     f"{project_path}/football_processed.pkl"
 )
+API_KEY = st.secrets["FOOTBALL_DATA_API_KEY"]
 
+headers = {
+    "X-Auth-Token": API_KEY
+}
 # ===================================================
 # TEAM LOGOS
 # ===================================================
@@ -423,7 +427,36 @@ def get_current_elo_ratings(
         )
 
     return ratings
+def get_upcoming_pl_fixtures():
 
+    url = "https://api.football-data.org/v4/competitions/PL/matches"
+
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=20
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    fixtures = []
+
+    for match in data["matches"]:
+
+        if match["status"] in [
+            "SCHEDULED",
+            "TIMED"
+        ]:
+
+            fixtures.append({
+                "Date": match["utcDate"],
+                "HomeTeam": match["homeTeam"]["name"],
+                "AwayTeam": match["awayTeam"]["name"]
+            })
+
+    return pd.DataFrame(fixtures)
 
 # ============================================================
 # BUILD ALL 28 FEATURES
@@ -680,10 +713,33 @@ if st.button("Predict Match"):
         st.success(
             f"Predicted Result: {result_text}"
         )
+
 st.markdown("---")
 st.header("📅 Upcoming Premier League Predictions")
-st.write(
-    "Predictions for upcoming Premier League matches "
-    "will appear here."
-)
 
+try:
+
+    upcoming_fixtures = get_upcoming_pl_fixtures()
+
+    if len(upcoming_fixtures) == 0:
+
+        st.info("No upcoming Premier League fixtures found.")
+
+    else:
+
+        upcoming_fixtures = upcoming_fixtures.head(10)
+
+        for _, match in upcoming_fixtures.iterrows():
+
+            home = match["HomeTeam"]
+            away = match["AwayTeam"]
+
+            st.write(
+                f"{home} vs {away}"
+            )
+
+except Exception as e:
+
+    st.error(
+        "Could not load upcoming Premier League fixtures."
+    )
