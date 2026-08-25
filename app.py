@@ -628,7 +628,7 @@ if st.button("Predict Match"):
                     team_logos[away_team],
                     width=70
                 )
-        st.markdown(f"### {away_team}")
+             st.markdown(f"### {away_team}")
         st.markdown("### Match probabilities")
 
         st.progress(
