@@ -680,3 +680,10 @@ if st.button("Predict Match"):
         st.success(
             f"Predicted Result: {result_text}"
         )
+st.markdown("---")
+st.header("📅 Upcoming Premier League Predictions")
+st.write(
+    "Predictions for upcoming Premier League matches "
+    "will appear here."
+)
+
