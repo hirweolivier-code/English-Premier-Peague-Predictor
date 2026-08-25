@@ -609,29 +609,41 @@ if st.button("Predict Match"):
             key=prob_dict.get
         )
 
-        col_home, col_vs, col_away = st.columns([2, 1, 2])
+               col_home, col_vs, col_away = st.columns([1.4, 0.5, 1.4])
 
         with col_home:
             if home_team in team_logos:
                 st.image(
                     team_logos[home_team],
-                    width=80
+                    width=75
                 )
-            st.markdown(f"<h3 style='text-align:center;'>{home_team}</h3>",
-                unsafe_allow_html=True)
+
+            st.markdown(
+                f"<div style='text-align:center; font-size:24px; font-weight:700;'>"
+                f"{home_team}</div>",
+                unsafe_allow_html=True
+            )
 
         with col_vs:
-            st.markdown("<h2 style='text-align:center; margin-top:25px;'>VS</h2>",
-                unsafe_allow_html=True)
+            st.markdown(
+                "<div style='text-align:center; "
+                "font-size:30px; font-weight:700; "
+                "padding-top:35px;'>VS</div>",
+                unsafe_allow_html=True
+            )
 
         with col_away:
             if away_team in team_logos:
                 st.image(
                     team_logos[away_team],
-                    width=80
+                    width=75
                 )
-            st.markdown(f"<h3 style='text-align:center;'>{away_team}</h3>",
-                unsafe_allow_html=True)
+
+            st.markdown(
+                f"<div style='text-align:center; font-size:24px; font-weight:700;'>"
+                f"{away_team}</div>",
+                unsafe_allow_html=True
+            )
         st.markdown("### Match probabilities")
 
         st.progress(
