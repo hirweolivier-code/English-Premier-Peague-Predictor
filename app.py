@@ -22,6 +22,22 @@ football = pd.read_pickle(
     f"{project_path}/football_processed.pkl"
 )
 
+# ===================================================
+# TEAM LOGOS
+# ===================================================
+
+team_logos = {
+    "Arsenal": "https://resources.premierleague.com/premierleague/badges/50/t3.png",
+    "Aston Villa": "https://resources.premierleague.com/premierleague/badges/50/t7.png",
+    "Bournemouth": "https://resources.premierleague.com/premierleague/badges/50/t91.png",
+    "Brighton": "https://resources.premierleague.com/premierleague/badges/50/t36.png",
+    "Chelsea": "https://resources.premierleague.com/premierleague/badges/50/t8.png",
+    "Liverpool": "https://resources.premierleague.com/premierleague/badges/50/t14.png",
+    "Man City": "https://resources.premierleague.com/premierleague/badges/50/t43.png",
+    "Man United": "https://resources.premierleague.com/premierleague/badges/50/t1.png",
+    "Newcastle": "https://resources.premierleague.com/premierleague/badges/50/t4.png",
+    "Tottenham": "https://resources.premierleague.com/premierleague/badges/50/t6.png"
+}
 
 # ============================================================
 # HELPER FUNCTIONS
@@ -593,10 +609,26 @@ if st.button("Predict Match"):
             key=prob_dict.get
         )
 
-        st.subheader(
-            f"{home_team} vs {away_team}"
-        )
+        col_home, col_vs, col_away = st.columns([2, 1, 2])
 
+        with col_home:
+            if home_team in team_logos:
+                st.image(
+                    team_logos[home_team],
+                    width=70
+                )
+            st.markdown(f"### {home_team}")
+
+        with col_vs:
+            st.markdown("### VS")
+
+        with col_away:
+            if away_team in team_logos:
+                st.image(
+                    team_logos[away_team],
+                    width=70
+                )
+        st.markdown(f"### {away_team}")
         st.markdown("### Match probabilities")
 
         st.progress(
