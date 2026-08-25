@@ -729,26 +729,26 @@ try:
 
         upcoming_fixtures = upcoming_fixtures.head(10)
 
-        for _, match in upcoming_fixtures.iterrows():
+    for _, match in upcoming_fixtures.iterrows():
 
-    home_api = match["HomeTeam"]
-    away_api = match["AwayTeam"]
+        home_api = match["HomeTeam"]
+        away_api = match["AwayTeam"]
 
-    home = API_TO_MODEL_TEAM.get(
-        home_api,
-        home_api
-    )
+        home = API_TO_MODEL_TEAM.get(
+            home_api,
+            home_api
+        )
 
-    away = API_TO_MODEL_TEAM.get(
-        away_api,
-        away_api
-    )
+        away = API_TO_MODEL_TEAM.get(
+            away_api,
+            away_api
+        )
 
-    st.write(
-        f"{home} vs {away}"
+        st.write(
+            f"{home} vs {away}"
     )
 except Exception as e:
 
-      st.error(
+        st.error(
         "Could not load upcoming Premier League fixtures."
     )
