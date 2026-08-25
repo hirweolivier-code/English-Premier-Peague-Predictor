@@ -629,6 +629,6 @@ if st.button("Predict Match"):
 
             result_text = "🤝 Draw"
 
-       st.success(
+        st.success(
             f"Predicted Result: {result_text}"
         )
