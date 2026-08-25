@@ -629,6 +629,6 @@ else:
 
     result_text = "🤝 Draw"
 
-        st.success(
+st.success(
             f"Predicted Result: {result_text}"
         )
