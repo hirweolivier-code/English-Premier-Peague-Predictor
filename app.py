@@ -614,18 +614,18 @@ if st.button("Predict Match"):
     text=f"{away_team} win — {p_away * 100:.1f}%"
 )    
 
-       if prediction == "H":
+        if prediction == "H":
 
     result_text = (
         f"🏆 {home_team} Win"
     )
-       elif prediction == "A":
+        elif prediction == "A":
 
     result_text = (
         f"🏆 {away_team} Win"
     )
 
-       else:
+        else:
 
     result_text = "🤝 Draw"
 
