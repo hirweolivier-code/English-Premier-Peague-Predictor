@@ -8,7 +8,7 @@ import joblib
 # LOAD MODEL AND DATA
 # ============================================================
 
-project_path = "/content/drive/MyDrive/Football_Prediction"
+project_path = "."
 
 final_elo_model = joblib.load(
     f"{project_path}/final_elo_model.pkl"
