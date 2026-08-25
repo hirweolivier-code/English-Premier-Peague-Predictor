@@ -749,7 +749,6 @@ try:
             )
 
 except Exception as e:
-
     st.error(
-        "Could not load upcoming Premier League fixtures."
+        f"{type(e).__name__}: {e}"
     )
