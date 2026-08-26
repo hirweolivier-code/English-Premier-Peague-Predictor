@@ -479,6 +479,7 @@ def get_upcoming_pl_fixtures():
 
             fixtures.append({
                 "Date": match["utcDate"],
+                "Matchday": match["matchday"],
                 "HomeTeam": match["homeTeam"]["name"],
                 "AwayTeam": match["awayTeam"]["name"]
             })
@@ -754,7 +755,20 @@ try:
 
     else:
 
-        upcoming_fixtures = upcoming_fixtures.head(10)
+        
+        upcoming_fixtures = upcoming_fixtures.sort_values("Date")
+
+        next_matchday = upcoming_fixtures[
+            "Matchday"
+        ].dropna().min()
+
+        upcoming_fixtures = upcoming_fixtures[
+            upcoming_fixtures["Matchday"] == next_matchday
+        ]
+
+        st.caption(
+            f"Premier League Matchweek {int(next_matchday)}"
+        )
 
         for _, match in upcoming_fixtures.iterrows():
 
