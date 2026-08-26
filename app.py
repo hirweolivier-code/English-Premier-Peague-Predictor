@@ -819,6 +819,16 @@ try:
             else:
                 prediction_text = "Draw"
 
+            match_date = pd.to_datetime(
+                match["Date"]
+            )
+
+            st.caption(
+                match_date.strftime(
+                    "%a %d %b %Y — %H:%M UTC"
+                )
+            )
+
             st.markdown(
                 f"### {home} vs {away}"
             )
