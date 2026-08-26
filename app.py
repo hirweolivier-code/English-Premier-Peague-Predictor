@@ -767,13 +767,73 @@ try:
             )
 
             away = API_TO_MODEL_TEAM.get(
-                away_api,
-                away_api
+            away_api,
+            away_api
+            )
+
+            model_teams = set(
+                football["HomeTeam"]
+            ) | set(
+                football["AwayTeam"]
+            )
+
+            if (
+                home not in model_teams
+                or away not in model_teams
+            ):
+                continue
+
+            X_future = make_future_match_features_final(
+                home,
+                away,
+                football,
+                season="2026/27"
+            )
+
+            probabilities = final_elo_model.predict_proba(
+                X_future
+            )[0]
+
+            prob_dict = dict(
+                zip(
+                    final_elo_model.classes_,
+                    probabilities
+                )
+            )
+
+            p_home = prob_dict["H"]
+            p_draw = prob_dict["D"]
+            p_away = prob_dict["A"]
+
+            prediction = max(
+                prob_dict,
+                key=prob_dict.get
+            )
+
+            if prediction == "H":
+                prediction_text = home
+
+            elif prediction == "A":
+                prediction_text = away
+
+            else:
+                prediction_text = "Draw"
+
+            st.markdown(
+                f"### {home} vs {away}"
             )
 
             st.write(
-                f"{home} vs {away}"
+                f"Home: {p_home * 100:.1f}% | "
+                f"Draw: {p_draw * 100:.1f}% | "
+                f"Away: {p_away * 100:.1f}%"
             )
+
+            st.success(
+                f"Prediction: {prediction_text}"
+            )
+
+            st.markdown("---")
 
 except Exception as e:
     st.error(
