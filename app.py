@@ -972,5 +972,13 @@ except Exception as e:
     st.error(
         f"Could not load upcoming fixtures: {type(e).__name__}: {e}"
     )
+man_city_recent = football_live[
+    (football_live["HomeTeam"] == "Man City") |
+    (football_live["AwayTeam"] == "Man City")
+][
+    ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR"]
+].tail(5)
 
+st.write("Man City latest 5 used by live history:")
+st.dataframe(man_city_recent)
 
