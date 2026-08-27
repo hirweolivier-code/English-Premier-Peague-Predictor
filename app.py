@@ -750,7 +750,7 @@ def get_finished_pl_matches():
 
     return pd.DataFrame(finished)
 st.markdown("---")
-st.header("Recent Finished Premier League Matches")
+
 recent_results = get_finished_pl_matches()
 
 football_live = football.copy()
