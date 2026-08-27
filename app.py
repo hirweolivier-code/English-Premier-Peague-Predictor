@@ -933,7 +933,11 @@ recent_results = get_finished_pl_matches()
 # ==================================================
 
 
-# immediately after it:
+recent_results = get_finished_pl_matches()
+
+st.write("recent_results rows:", len(recent_results))
+st.write("football rows:", len(football))
+
 football_live = football.copy()
 
 football_live["Date"] = pd.to_datetime(
@@ -962,3 +966,11 @@ football_live = football_live.drop_duplicates(
 football_live = football_live.sort_values(
     "Date"
 ).reset_index(drop=True)
+
+st.write("football_live rows:", len(football_live))
+
+st.write(
+    football_live[
+        ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR"]
+    ].tail(5)
+)
