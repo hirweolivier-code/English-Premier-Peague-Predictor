@@ -922,23 +922,19 @@ try:
             st.markdown("---")
             st.header("Recent Finished Premier League Matches")
 
-            try:
-                recent_results = get_finished_pl_matches()
+            recent_results = get_finished_pl_matches()
 
-                st.dataframe(
-                    recent_results[
-                        [
-                            "Date",
-                            "HomeTeam",
-                            "AwayTeam",
-                            "FTHG",
-                            "FTAG",
-                            "FTR"
-                        ]
-                    ].tail(10),
-                    use_container_width=True
-                )
-            except Exception as e:
-                st.error(
-                    f"{type(e).__name__}: {e}"
+            st.dataframe(
+                recent_results[
+                    [
+                        "Date",
+                        "HomeTeam",
+                        "AwayTeam",
+                        "FTHG",
+                        "FTAG",
+                        "FTR"
+                    ]
+                ].tail(10),
+                use_container_width=True
             )
+            
