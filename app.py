@@ -10,12 +10,12 @@ import joblib
 
 project_path = "."
 
-final_elo_model = joblib.load(
-    f"{project_path}/final_elo_model.pkl"
+final_v2_model = joblib.load(
+    f"{project_path}/final_v2_model.pkl"
 )
 
-features_elo40 = joblib.load(
-    f"{project_path}/features_elo40.pkl"
+features_v2 = joblib.load(
+    f"{project_path}/features_v2.pkl"
 )
 
 football = pd.read_pickle(
