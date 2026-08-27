@@ -663,6 +663,66 @@ def get_finished_pl_matches():
         })
 
     return pd.DataFrame(finished)
+# ==================================================
+# BUILD LIVE MATCH HISTORY
+# ==================================================
+
+football_live = football.copy()
+
+# Make dates comparable
+football_live["Date"] = pd.to_datetime(
+    football_live["Date"],
+    errors="coerce",
+    utc=True
+)
+
+recent_results["Date"] = pd.to_datetime(
+    recent_results["Date"],
+    errors="coerce",
+    utc=True
+)
+
+# Add current finished matches
+football_live = pd.concat(
+    [
+        football_live,
+        recent_results
+    ],
+    ignore_index=True,
+    sort=False
+)
+
+# Remove duplicate matches
+football_live = football_live.drop_duplicates(
+    subset=[
+        "Date",
+        "HomeTeam",
+        "AwayTeam"
+    ],
+    keep="last"
+)
+
+# Sort everything chronologically
+football_live = football_live.sort_values(
+    "Date"
+).reset_index(drop=True)
+
+print("Historical rows:", len(football))
+print("Live rows:", len(football_live))   
+st.dataframe(
+    football_live[
+        [
+            "Date",
+            "Season",
+            "HomeTeam",
+            "AwayTeam",
+            "FTHG",
+            "FTAG",
+            "FTR"
+        ]
+    ].tail(15),
+    use_container_width=True
+)
 # ============================================================
 # STREAMLIT PAGE
 # ============================================================
