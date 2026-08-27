@@ -720,7 +720,7 @@ if st.button("Predict Match"):
         X_future = make_future_match_features_final(
             home_team,
             away_team,
-            football,
+            football_live,
             season="2026/27"
         )
 
@@ -874,7 +874,7 @@ try:
             X_future = make_future_match_features_final(
                 home,
                 away,
-                football,
+                football_live,
                 season="2026/27"
             )
 
