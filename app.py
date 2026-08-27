@@ -99,7 +99,73 @@ def resolve_team_name(team, df):
     raise ValueError(
         f"Multiple matches found for '{team}': {matches}"
     )
+def previous_h2h_stats(
+    home_team,
+    away_team,
+    current_index,
+    df,
+    n=5
+):
 
+    previous_matches = df.iloc[:current_index]
+
+    h2h = previous_matches[
+        (
+            (previous_matches["HomeTeam"] == home_team)
+            &
+            (previous_matches["AwayTeam"] == away_team)
+        )
+        |
+        (
+            (previous_matches["HomeTeam"] == away_team)
+            &
+            (previous_matches["AwayTeam"] == home_team)
+        )
+    ].tail(n)
+
+    home_points = 0
+    away_points = 0
+    home_goals = 0
+    away_goals = 0
+
+    for _, match in h2h.iterrows():
+
+        if match["HomeTeam"] == home_team:
+
+            home_goals += match["FTHG"]
+            away_goals += match["FTAG"]
+
+            if match["FTR"] == "H":
+                home_points += 3
+            elif match["FTR"] == "A":
+                away_points += 3
+            else:
+                home_points += 1
+                away_points += 1
+
+        else:
+
+            home_goals += match["FTAG"]
+            away_goals += match["FTHG"]
+
+            if match["FTR"] == "A":
+                home_points += 3
+            elif match["FTR"] == "H":
+                away_points += 3
+            else:
+                home_points += 1
+                away_points += 1
+
+    if len(h2h) == 0:
+        return 0, 0, 0
+
+    h2h_goal_diff = home_goals - away_goals
+
+    return (
+        home_points,
+        away_points,
+        h2h_goal_diff
+    )
 
 def previous_5_form(team, current_index, df):
 
@@ -515,6 +581,12 @@ def make_future_match_features_final(
         season = df.iloc[-1]["Season"]
 
     i = len(df)
+    h2h_home_points, h2h_away_points, h2h_goal_diff = previous_h2h_stats(
+    home_team,
+    away_team,
+    i,
+    df,
+    n=5)
 
     h_form = previous_5_form(home_team, i, df)
     a_form = previous_5_form(away_team, i, df)
@@ -562,6 +634,9 @@ def make_future_match_features_final(
     a_elo = elo_ratings.get(away_team, 1500)
 
     future = pd.DataFrame([{
+        "H2HHomePoints": h2h_home_points,
+        "H2HAwayPoints": h2h_away_points,
+        "H2HGoalDiff": h2h_goal_diff,
 
         "HomeForm5": h_form,
         "AwayForm5": a_form,
