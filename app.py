@@ -938,7 +938,7 @@ try:
                     ].tail(10),
                     use_container_width=True
             )
-except Exception as e:
-    st.error(
-        f"{type(e).__name__}: {e}"
-    )
+        except Exception as e:
+            st.error(
+                f"{type(e).__name__}: {e}"
+            )
