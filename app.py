@@ -273,23 +273,29 @@ def previous_5_sot(team, current_index, df):
     team_matches = previous_matches[
         (previous_matches["HomeTeam"] == team) |
         (previous_matches["AwayTeam"] == team)
-    ].tail(5)
+    ]
 
     shots_on_target = []
 
-    for _, match in team_matches.iterrows():
+    # Work backwards through matches
+    for _, match in team_matches.iloc[::-1].iterrows():
 
         if match["HomeTeam"] == team:
-            shots_on_target.append(match["HST"])
-
+            value = match.get("HST", np.nan)
         else:
-            shots_on_target.append(match["AST"])
+            value = match.get("AST", np.nan)
 
-    if len(team_matches) == 0:
+        # Ignore API matches where SOT is unavailable
+        if pd.notna(value):
+            shots_on_target.append(value)
+
+        if len(shots_on_target) == 5:
+            break
+
+    if len(shots_on_target) == 0:
         return 0
 
     return np.mean(shots_on_target)
-
 
 def previous_5_sota(team, current_index, df):
 
@@ -298,23 +304,28 @@ def previous_5_sota(team, current_index, df):
     team_matches = previous_matches[
         (previous_matches["HomeTeam"] == team) |
         (previous_matches["AwayTeam"] == team)
-    ].tail(5)
+    ]
 
     shots_allowed = []
 
-    for _, match in team_matches.iterrows():
+    # Work backwards through matches
+    for _, match in team_matches.iloc[::-1].iterrows():
 
         if match["HomeTeam"] == team:
-            shots_allowed.append(match["AST"])
-
+            value = match.get("AST", np.nan)
         else:
-            shots_allowed.append(match["HST"])
+            value = match.get("HST", np.nan)
 
-    if len(team_matches) == 0:
+        if pd.notna(value):
+            shots_allowed.append(value)
+
+        if len(shots_allowed) == 5:
+            break
+
+    if len(shots_allowed) == 0:
         return 0
 
     return np.mean(shots_allowed)
-
 
 def future_season_strength(team, season, df):
 
