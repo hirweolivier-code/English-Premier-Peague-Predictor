@@ -609,7 +609,7 @@ def make_future_match_features_final(
             h_elo - a_elo
     }])
 
-    return future[features_elo40]
+    return future[features_v2]
 
 def get_finished_pl_matches():
 
