@@ -600,7 +600,69 @@ def make_future_match_features_final(
 
     return future[features_elo40]
 
+def get_finished_pl_matches():
 
+    url = (
+        "https://api.football-data.org/v4/"
+        "competitions/PL/matches?status=FINISHED"
+    )
+
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=20
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    finished = []
+
+    for match in data["matches"]:
+
+        home_api = match["homeTeam"]["name"]
+        away_api = match["awayTeam"]["name"]
+
+        home = API_TO_MODEL_TEAM.get(
+            home_api,
+            home_api
+        )
+
+        away = API_TO_MODEL_TEAM.get(
+            away_api,
+            away_api
+        )
+
+        home_goals = match["score"]["fullTime"]["home"]
+        away_goals = match["score"]["fullTime"]["away"]
+
+        if (
+            home_goals is None
+            or away_goals is None
+        ):
+            continue
+
+        if home_goals > away_goals:
+            result = "H"
+
+        elif home_goals < away_goals:
+            result = "A"
+
+        else:
+            result = "D"
+
+        finished.append({
+            "Date": match["utcDate"],
+            "Season": "2026/27",
+            "HomeTeam": home,
+            "AwayTeam": away,
+            "FTHG": home_goals,
+            "FTAG": away_goals,
+            "FTR": result
+        })
+
+    return pd.DataFrame(finished)
 # ============================================================
 # STREAMLIT PAGE
 # ============================================================
@@ -858,7 +920,24 @@ try:
             )
 
             st.markdown("---")
+            st.header("Recent Finished Premier League Matches")
 
+            try:
+                recent_results = get_finished_pl_matches()
+
+                st.dataframe(
+                    recent_results[
+                        [
+                            "Date",
+                            "HomeTeam",
+                            "AwayTeam",
+                            "FTHG",
+                            "FTAG",
+                            "FTR"
+                        ]
+                    ].tail(10),
+                    use_container_width=True
+            )
 except Exception as e:
     st.error(
         f"{type(e).__name__}: {e}"
