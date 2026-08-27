@@ -674,7 +674,45 @@ def get_finished_pl_matches():
         })
 
     return pd.DataFrame(finished)
+st.markdown("---")
+st.header("Recent Finished Premier League Matches")
+recent_results = get_finished_pl_matches()
 
+football_live = football.copy()
+
+football_live["Date"] = pd.to_datetime(
+    football_live["Date"],
+    errors="coerce",
+    utc=True
+)
+
+recent_results["Date"] = pd.to_datetime(
+    recent_results["Date"],
+    errors="coerce",
+    utc=True
+)
+
+football_live = pd.concat(
+    [
+        football_live,
+        recent_results
+    ],
+    ignore_index=True,
+    sort=False
+)
+
+football_live = football_live.drop_duplicates(
+    subset=[
+        "Date",
+        "HomeTeam",
+        "AwayTeam"
+    ],
+    keep="last"
+)
+
+football_live = football_live.sort_values(
+    "Date"
+).reset_index(drop=True)
 # ============================================================
 # STREAMLIT PAGE
 # ============================================================
@@ -934,54 +972,5 @@ except Exception as e:
     st.error(
         f"Could not load upcoming fixtures: {type(e).__name__}: {e}"
     )
-st.markdown("---")
-st.header("Recent Finished Premier League Matches")
-
-recent_results = get_finished_pl_matches()
-
-# ==================================================
-# BUILD LIVE MATCH HISTORY
-# ==================================================
 
 
-recent_results = get_finished_pl_matches()
-
-st.write("recent_results rows:", len(recent_results))
-st.write("football rows:", len(football))
-
-football_live = football.copy()
-
-football_live["Date"] = pd.to_datetime(
-    football_live["Date"],
-    errors="coerce",
-    utc=True
-)
-
-recent_results["Date"] = pd.to_datetime(
-    recent_results["Date"],
-    errors="coerce",
-    utc=True
-)
-
-football_live = pd.concat(
-    [football_live, recent_results],
-    ignore_index=True,
-    sort=False
-)
-
-football_live = football_live.drop_duplicates(
-    subset=["Date", "HomeTeam", "AwayTeam"],
-    keep="last"
-)
-
-football_live = football_live.sort_values(
-    "Date"
-).reset_index(drop=True)
-
-st.write("football_live rows:", len(football_live))
-
-st.write(
-    football_live[
-        ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR"]
-    ].tail(5)
-)
