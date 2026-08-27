@@ -837,13 +837,13 @@ if st.button("Predict Match"):
             season="2026/27"
         )
 
-        probabilities = final_elo_model.predict_proba(
+        probabilities = final_v2_model.predict_proba(
             X_future
         )[0]
 
         prob_dict = dict(
             zip(
-                final_elo_model.classes_,
+                final_v2_model.classes_,
                 probabilities
             )
         )
@@ -991,13 +991,13 @@ try:
                 season="2026/27"
             )
 
-            probabilities = final_elo_model.predict_proba(
+            probabilities = final_v2_model.predict_proba(
                 X_future
             )[0]
 
             prob_dict = dict(
                 zip(
-                    final_elo_model.classes_,
+                    final_v2_model.classes_,
                     probabilities
                 )
             )
