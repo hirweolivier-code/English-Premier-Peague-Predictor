@@ -932,6 +932,8 @@ recent_results = get_finished_pl_matches()
 # BUILD LIVE MATCH HISTORY
 # ==================================================
 
+
+# immediately after it:
 football_live = football.copy()
 
 football_live["Date"] = pd.to_datetime(
@@ -947,37 +949,16 @@ recent_results["Date"] = pd.to_datetime(
 )
 
 football_live = pd.concat(
-    [
-        football_live,
-        recent_results
-    ],
+    [football_live, recent_results],
     ignore_index=True,
     sort=False
 )
 
 football_live = football_live.drop_duplicates(
-    subset=[
-        "Date",
-        "HomeTeam",
-        "AwayTeam"
-    ],
+    subset=["Date", "HomeTeam", "AwayTeam"],
     keep="last"
 )
 
 football_live = football_live.sort_values(
     "Date"
 ).reset_index(drop=True)
-st.dataframe(
-    recent_results[
-        [
-            "Date",
-            "HomeTeam",
-            "AwayTeam",
-            "FTHG",
-            "FTAG",
-            "FTR"
-        ]
-    ].tail(10),
-    use_container_width=True
-)
-            
