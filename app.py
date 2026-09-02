@@ -806,6 +806,25 @@ if pd.notna(latest_update):
         "Data last updated: "
         + latest_update.strftime("%d %b %Y — %H:%M UTC")
     )
+with st.expander("ℹ️ About the prediction model"):
+
+    st.write(
+        "Model: Multiclass Logistic Regression"
+    )
+
+    st.write(
+        "Features: 31, including recent form, goals, "
+        "home/away form, PPG, team strength, Elo and H2H."
+    )
+
+    st.write(
+        "Model tuning: C = 0.003 using expanding "
+        "time-series validation."
+    )
+
+    st.write(
+        "Predictions are probabilities, not guaranteed results."
+    )
 st.write(
     "Select the home and away teams to predict the match outcome."
 )
