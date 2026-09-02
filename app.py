@@ -597,8 +597,8 @@ def get_upcoming_pl_fixtures():
             "Matchday": match["matchday"],
             "HomeTeam": match["homeTeam"]["name"],
             "AwayTeam": match["awayTeam"]["name"]
-         })
-            })
+        })
+         
 
     return pd.DataFrame(fixtures)
 
