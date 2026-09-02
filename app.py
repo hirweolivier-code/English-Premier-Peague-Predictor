@@ -799,7 +799,13 @@ st.set_page_config(
 )
 
 st.title("⚽ Premier League Match Predictor")
+latest_update = football_live["Date"].max()
 
+if pd.notna(latest_update):
+    st.caption(
+        "Data last updated: "
+        + latest_update.strftime("%d %b %Y — %H:%M UTC")
+    )
 st.write(
     "Select the home and away teams to predict the match outcome."
 )
