@@ -1103,7 +1103,7 @@ try:
                     "%a %d %b %Y — %H:%M UTC"
                 )
             )
-def update_finished_predictions(finished_matches):
+ def update_finished_predictions(finished_matches):
 
     for _, match in finished_matches.iterrows():
 
