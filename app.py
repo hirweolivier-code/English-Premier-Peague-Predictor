@@ -1103,10 +1103,47 @@ try:
                     "%a %d %b %Y — %H:%M UTC"
                 )
             )
+def update_finished_predictions(finished_matches):
 
+    for _, match in finished_matches.iterrows():
+
+        api_match_id = int(match["api_match_id"])
+        actual_result = match["FTR"]
+
+        existing = (
+            supabase
+            .table("predictions")
+            .select("id,predicted_result,actual_result")
+            .eq("api_match_id", api_match_id)
+            .execute()
+        )
+
+        if not existing.data:
+            continue
+
+        row = existing.data[0]
+
+        # Already updated before
+        if row["actual_result"] is not None:
+            continue
+
+        predicted_result = row["predicted_result"]
+
+        is_correct = predicted_result == actual_result
+
+        (
+            supabase
+            .table("predictions")
+            .update({
+                "actual_result": actual_result,
+                "correct": is_correct
+            })
+            .eq("api_match_id", api_match_id)
+            .execute()
+        )     
             st.markdown(
                 f"### {home} vs {away}"
-            )
+        )
 
             st.write(
                 f"Home: {p_home * 100:.1f}% | "
