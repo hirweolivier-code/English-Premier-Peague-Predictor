@@ -8,7 +8,39 @@ supabase: Client = create_client(
     st.secrets["SUPABASE_URL"],
     st.secrets["SUPABASE_KEY"]
 )
+def save_prediction_if_new(
+    api_match_id,
+    match_date,
+    home_team,
+    away_team,
+    home_prob,
+    draw_prob,
+    away_prob,
+    predicted_result
+):
+    existing = (
+        supabase
+        .table("predictions")
+        .select("id")
+        .eq("api_match_id", api_match_id)
+        .execute()
+    )
 
+    if not existing.data:
+        row = {
+            "api_match_id": int(api_match_id),
+            "match_date": str(match_date),
+            "home_team": home_team,
+            "away_team": away_team,
+            "home_prob": float(home_prob),
+            "draw_prob": float(draw_prob),
+            "away_prob": float(away_prob),
+            "predicted_result": predicted_result,
+            "actual_result": None,
+            "correct": None
+        }
+
+        supabase.table("predictions").insert(row).execute()
 # ============================================================
 # LOAD MODEL AND DATA
 # ============================================================
