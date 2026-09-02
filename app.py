@@ -8,6 +8,23 @@ supabase: Client = create_client(
     st.secrets["SUPABASE_URL"],
     st.secrets["SUPABASE_KEY"]
 )
+if st.button("Test Supabase Insert"):
+    test_row = {
+        "match_date": "2026-09-05T14:00:00+00:00",
+        "home_team": "Man City",
+        "away_team": "Liverpool",
+        "home_prob": 0.50,
+        "draw_prob": 0.25,
+        "away_prob": 0.25,
+        "predicted_result": "H",
+        "actual_result": None,
+        "correct": None,
+        "api_match_id": 999999999
+    }
+
+    response = supabase.table("predictions").insert(test_row).execute()
+
+    st.write(response)
 # ============================================================
 # LOAD MODEL AND DATA
 # ============================================================
