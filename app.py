@@ -591,13 +591,13 @@ def get_upcoming_pl_fixtures():
             "TIMED"
         ]:
 
-        fixtures.append({
-            "id": match["id"],
-            "Date": match["utcDate"],
-            "Matchday": match["matchday"],
-            "HomeTeam": match["homeTeam"]["name"],
-            "AwayTeam": match["awayTeam"]["name"]
-        })
+           fixtures.append({
+               "id": match["id"],
+               "Date": match["utcDate"],
+               "Matchday": match["matchday"],
+               "HomeTeam": match["homeTeam"]["name"],
+               "AwayTeam": match["awayTeam"]["name"]
+           })
          
 
     return pd.DataFrame(fixtures)
