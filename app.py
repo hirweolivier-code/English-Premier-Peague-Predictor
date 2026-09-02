@@ -591,11 +591,13 @@ def get_upcoming_pl_fixtures():
             "TIMED"
         ]:
 
-            fixtures.append({
-                "Date": match["utcDate"],
-                "Matchday": match["matchday"],
-                "HomeTeam": match["homeTeam"]["name"],
-                "AwayTeam": match["awayTeam"]["name"]
+        fixtures.append({
+            "id": match["id"],
+            "Date": match["utcDate"],
+            "Matchday": match["matchday"],
+            "HomeTeam": match["homeTeam"]["name"],
+            "AwayTeam": match["awayTeam"]["name"]
+        })
             })
 
     return pd.DataFrame(fixtures)
@@ -1085,7 +1087,16 @@ try:
             match_date = pd.to_datetime(
                 match["Date"]
             )
-
+            save_prediction_if_new(
+                api_match_id=match["id"],
+                match_date=match_date.isoformat(),
+                home_team=home,
+                away_team=away,
+                home_prob=p_home,
+                draw_prob=p_draw,
+                away_prob=p_away,
+                predicted_result=prediction
+            )
             st.caption(
                 match_date.strftime(
                     "%a %d %b %Y — %H:%M UTC"
