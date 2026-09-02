@@ -1124,23 +1124,23 @@ try:
                     row = existing.data[0]
 
                    # Already updated before
-                   if row["actual_result"] is not None:
-                       continue
+                    if row["actual_result"] is not None:
+                        continue
 
-                   predicted_result = row["predicted_result"]
+                    predicted_result = row["predicted_result"]
 
-                   is_correct = predicted_result == actual_result
+                    is_correct = predicted_result == actual_result
 
-                   (
-                        supabase
-                        .table("predictions")
-                        .update({
-                            "actual_result": actual_result,
-                            "correct": is_correct
-                        })
-                        .eq("api_match_id", api_match_id)
-                        .execute()
-                   )     
+                    (
+                         supabase
+                         .table("predictions")
+                         .update({
+                             "actual_result": actual_result,
+                             "correct": is_correct
+                         })
+                         .eq("api_match_id", api_match_id)
+                         .execute()
+                     )     
             st.markdown(
                 f"### {home} vs {away}"
         )
