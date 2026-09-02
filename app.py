@@ -778,6 +778,7 @@ def get_finished_pl_matches():
             result = "D"
 
         finished.append({
+            "api_match_id": match["id"],
             "Date": match["utcDate"],
             "Season": "2026/27",
             "HomeTeam": home,
