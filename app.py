@@ -662,6 +662,30 @@ def get_upcoming_pl_fixtures():
          
 
     return pd.DataFrame(fixtures)
+def get_prediction_type_counts():
+
+    response = (
+        supabase
+        .table("predictions")
+        .select("predicted_result")
+        .execute()
+    )
+
+    rows = response.data
+
+    counts = {
+        "H": 0,
+        "D": 0,
+        "A": 0
+    }
+
+    for row in rows:
+        result = row["predicted_result"]
+
+        if result in counts:
+            counts[result] += 1
+
+    return counts
 
 # ============================================================
 # BUILD ALL 28 FEATURES
@@ -1071,6 +1095,34 @@ else:
             f"{result['Correct']}/{result['Matches']} correct "
             f"({result['Accuracy'] * 100:.1f}%)"
         )
+st.subheader("⚽ Prediction Distribution")
+
+prediction_counts = get_prediction_type_counts()
+
+total_predictions = sum(prediction_counts.values())
+
+if total_predictions == 0:
+
+    st.info("No predictions saved yet.")
+
+else:
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric(
+        "Home",
+        prediction_counts["H"]
+    )
+
+    col2.metric(
+        "Draw",
+        prediction_counts["D"]
+    )
+
+    col3.metric(
+        "Away",
+        prediction_counts["A"]
+    )
 teams = sorted(
     set(football["HomeTeam"])
     | set(football["AwayTeam"])
