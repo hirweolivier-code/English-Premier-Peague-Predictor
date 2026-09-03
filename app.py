@@ -792,6 +792,7 @@ def get_finished_pl_matches():
 st.markdown("---")
 
 recent_results = get_finished_pl_matches()
+update_finished_predictions(recent_results)
 
 football_live = football.copy()
 
