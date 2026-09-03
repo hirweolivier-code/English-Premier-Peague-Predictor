@@ -41,6 +41,67 @@ def save_prediction_if_new(
         }
 
         supabase.table("predictions").insert(row).execute()
+def get_confidence_performance():
+
+    response = (
+        supabase
+        .table("predictions")
+        .select(
+            "home_prob,draw_prob,away_prob,correct"
+        )
+        .not_.is_("actual_result", "null")
+        .execute()
+    )
+
+    rows = response.data
+
+    if not rows:
+        return []
+
+    buckets = {
+        "40–50%": [0, 0],
+        "50–60%": [0, 0],
+        "60–70%": [0, 0],
+        "70%+": [0, 0]
+    }
+
+    for row in rows:
+
+        confidence = max(
+            row["home_prob"],
+            row["draw_prob"],
+            row["away_prob"]
+        )
+
+        if confidence < 0.50:
+            bucket = "40–50%"
+        elif confidence < 0.60:
+            bucket = "50–60%"
+        elif confidence < 0.70:
+            bucket = "60–70%"
+        else:
+            bucket = "70%+"
+
+        buckets[bucket][0] += 1
+
+        if row["correct"]:
+            buckets[bucket][1] += 1
+
+    results = []
+
+    for bucket, (total, correct) in buckets.items():
+
+        if total > 0:
+            accuracy = correct / total
+
+            results.append({
+                "Confidence": bucket,
+                "Matches": total,
+                "Correct": correct,
+                "Accuracy": accuracy
+            })
+
+    return results      
 # ============================================================
 # LOAD MODEL AND DATA
 # ============================================================
@@ -989,6 +1050,26 @@ else:
             f"🤝 Draw: {row['draw_prob'] * 100:.1f}% | "
             f"✈️ {row['away_team']}: {row['away_prob'] * 100:.1f}%  \n"
             f"Actual: **{actual_text}**"
+        )
+st.subheader("🎯 Performance by Confidence")
+
+confidence_results = get_confidence_performance()
+
+if not confidence_results:
+
+    st.info(
+        "Confidence performance will appear "
+        "after predictions have completed."
+    )
+
+else:
+
+    for result in confidence_results:
+
+        st.write(
+            f"**{result['Confidence']}** — "
+            f"{result['Correct']}/{result['Matches']} correct "
+            f"({result['Accuracy'] * 100:.1f}%)"
         )
 teams = sorted(
     set(football["HomeTeam"])
