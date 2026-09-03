@@ -887,6 +887,56 @@ def get_live_model_performance():
     accuracy = correct / completed
 
     return completed, correct, accuracy
+def get_prediction_history():
+
+    response = (
+        supabase
+        .table("predictions")
+        .select(
+            "match_date,home_team,away_team,"
+            "predicted_result,actual_result,correct"
+        )
+        .not_.is_("actual_result", "null")
+        .order("match_date", desc=True)
+        .execute()
+    )
+
+    return response.data
+
+history = get_prediction_history()
+
+st.subheader("📋 Prediction History")
+
+if not history:
+    st.info("No completed predictions yet.")
+
+else:
+    for row in history:
+
+        if row["predicted_result"] == "H":
+            predicted_text = row["home_team"]
+
+        elif row["predicted_result"] == "A":
+            predicted_text = row["away_team"]
+
+        else:
+            predicted_text = "Draw"
+
+        if row["actual_result"] == "H":
+            actual_text = row["home_team"]
+
+        elif row["actual_result"] == "A":
+            actual_text = row["away_team"]
+
+        else:
+            actual_text = "Draw"
+
+        status = "✅" if row["correct"] else "❌"
+
+        st.write(
+            f"{status} {row['home_team']} vs {row['away_team']} "
+            f"— Predicted: {predicted_text} | Actual: {actual_text}"
+        )
 # ============================================================
 # STREAMLIT PAGE
 # ============================================================
