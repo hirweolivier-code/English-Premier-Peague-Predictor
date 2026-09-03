@@ -941,9 +941,7 @@ with st.expander("ℹ️ About the prediction model"):
     st.write(
         "Predictions are probabilities, not guaranteed results."
     )
-    st.write(
-        "Select the home and away teams to predict the match outcome."
-    )
+   
 completed, correct, accuracy = get_live_model_performance()
 
 st.subheader("📊 2026/27 Prediction Performance")
@@ -961,7 +959,9 @@ teams = sorted(
     set(football["HomeTeam"])
     | set(football["AwayTeam"])
 )
-
+st.write(
+    "Select the home and away teams to predict the match outcome."
+)
 home_team = st.selectbox(
     "Home Team",
     teams
