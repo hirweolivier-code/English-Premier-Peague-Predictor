@@ -110,19 +110,7 @@ team_logos = {
 # ============================================================
 # HELPER FUNCTIONS
 # ============================================================
-completed, correct, accuracy = get_live_model_performance()
 
-st.subheader("📊 2026/27 Prediction Performance")
-
-col1, col2, col3 = st.columns(3)
-
-col1.metric("Completed", completed)
-col2.metric("Correct", correct)
-
-if accuracy is None:
-    col3.metric("Accuracy", "—")
-else:
-    col3.metric("Accuracy", f"{accuracy * 100:.1f}%")
 def resolve_team_name(team, df):
 
     teams = pd.unique(
@@ -939,7 +927,19 @@ with st.expander("ℹ️ About the prediction model"):
 st.write(
     "Select the home and away teams to predict the match outcome."
 )
+completed, correct, accuracy = get_live_model_performance()
 
+st.subheader("📊 2026/27 Prediction Performance")
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Completed", completed)
+col2.metric("Correct", correct)
+
+if accuracy is None:
+    col3.metric("Accuracy", "—")
+else:
+    col3.metric("Accuracy", f"{accuracy * 100:.1f}%")
 teams = sorted(
     set(football["HomeTeam"])
     | set(football["AwayTeam"])
