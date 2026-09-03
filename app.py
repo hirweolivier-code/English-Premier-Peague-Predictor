@@ -894,6 +894,7 @@ def get_prediction_history():
         .table("predictions")
         .select(
             "match_date,home_team,away_team,"
+            "home_prob,draw_prob,away_prob,"
             "predicted_result,actual_result,correct"
         )
         .not_.is_("actual_result", "null")
@@ -982,8 +983,12 @@ else:
         status = "✅" if row["correct"] else "❌"
 
         st.write(
-            f"{status} {row['home_team']} vs {row['away_team']} "
-            f"— Predicted: {predicted_text} | Actual: {actual_text}"
+            f"{status} **{row['home_team']} vs {row['away_team']}**  \n"
+            f"Prediction: {predicted_text}  \n"
+            f"🏠 {row['home_team']}: {row['home_prob'] * 100:.1f}% | "
+            f"🤝 Draw: {row['draw_prob'] * 100:.1f}% | "
+            f"✈️ {row['away_team']}: {row['away_prob'] * 100:.1f}%  \n"
+            f"Actual: **{actual_text}**"
         )
 teams = sorted(
     set(football["HomeTeam"])
