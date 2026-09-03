@@ -955,6 +955,36 @@ if accuracy is None:
     col3.metric("Accuracy", "—")
 else:
     col3.metric("Accuracy", f"{accuracy * 100:.1f}%")
+history = get_prediction_history()
+
+st.subheader("📋 Prediction History")
+
+if not history:
+    st.info("No completed predictions yet.")
+
+else:
+    for row in history:
+
+        if row["predicted_result"] == "H":
+            predicted_text = row["home_team"]
+        elif row["predicted_result"] == "A":
+            predicted_text = row["away_team"]
+        else:
+            predicted_text = "Draw"
+
+        if row["actual_result"] == "H":
+            actual_text = row["home_team"]
+        elif row["actual_result"] == "A":
+            actual_text = row["away_team"]
+        else:
+            actual_text = "Draw"
+
+        status = "✅" if row["correct"] else "❌"
+
+        st.write(
+            f"{status} {row['home_team']} vs {row['away_team']} "
+            f"— Predicted: {predicted_text} | Actual: {actual_text}"
+        )
 teams = sorted(
     set(football["HomeTeam"])
     | set(football["AwayTeam"])
