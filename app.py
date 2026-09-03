@@ -110,7 +110,19 @@ team_logos = {
 # ============================================================
 # HELPER FUNCTIONS
 # ============================================================
+completed, correct, accuracy = get_live_model_performance()
 
+st.subheader("📊 2026/27 Prediction Performance")
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Completed", completed)
+col2.metric("Correct", correct)
+
+if accuracy is None:
+    col3.metric("Accuracy", "—")
+else:
+    col3.metric("Accuracy", f"{accuracy * 100:.1f}%")
 def resolve_team_name(team, df):
 
     teams = pd.unique(
@@ -866,6 +878,27 @@ football_live = football_live.drop_duplicates(
 football_live = football_live.sort_values(
     "Date"
 ).reset_index(drop=True)
+def get_live_model_performance():
+
+    response = (
+        supabase
+        .table("predictions")
+        .select("predicted_result,actual_result,correct")
+        .not_.is_("actual_result", "null")
+        .execute()
+    )
+
+    rows = response.data
+
+    if not rows:
+        return 0, 0, None
+
+    completed = len(rows)
+    correct = sum(1 for row in rows if row["correct"] is True)
+
+    accuracy = correct / completed
+
+    return completed, correct, accuracy
 # ============================================================
 # STREAMLIT PAGE
 # ============================================================
