@@ -1370,26 +1370,31 @@ try:
                 season="2026/27"
             )
 
-            probabilities = final_v2_model.predict_proba(
+            # Poisson expected goals
+            home_xg = final_home_poisson.predict(
                 X_future
             )[0]
 
-            prob_dict = dict(
-                zip(
-                    final_v2_model.classes_,
-                    probabilities
-                )
+            away_xg = final_away_poisson.predict(
+                X_future
+            )[0]
+
+            # Convert expected goals to H / D / A probabilities
+            p_home, p_draw, p_away = poisson_match_probabilities_single(
+                home_xg,
+                away_xg
             )
 
-            p_home = prob_dict["H"]
-            p_draw = prob_dict["D"]
-            p_away = prob_dict["A"]
+            prob_dict = {
+                "H": p_home,
+                "D": p_draw,
+                "A": p_away
+            }
 
             prediction = max(
                 prob_dict,
                 key=prob_dict.get
             )
-
             if prediction == "H":
                 prediction_text = home
 
