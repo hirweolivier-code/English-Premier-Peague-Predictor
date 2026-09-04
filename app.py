@@ -1310,7 +1310,11 @@ st.header("📅 Upcoming Premier League Predictions")
 try:
 
     upcoming_fixtures = get_upcoming_pl_fixtures()
-
+    st.write(
+        upcoming_fixtures[
+            ["Date", "Matchday", "HomeTeam", "AwayTeam"]
+        ].head(30)
+    )
     if len(upcoming_fixtures) == 0:
 
         st.info("No upcoming Premier League fixtures found.")
