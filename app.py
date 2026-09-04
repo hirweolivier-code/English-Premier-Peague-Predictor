@@ -1211,21 +1211,25 @@ if st.button("Predict Match"):
             football_live,
             season="2026/27"
         )
-
-        probabilities = final_v2_model.predict_proba(
+        home_xg = final_home_poisson.predict(
             X_future
         )[0]
 
-        prob_dict = dict(
-            zip(
-                final_v2_model.classes_,
-                probabilities
-            )
-        )
+        away_xg = final_away_poisson.predict(
+            X_future
+        )[0]
 
-        p_home = prob_dict["H"]
-        p_draw = prob_dict["D"]
-        p_away = prob_dict["A"]
+        p_home, p_draw, p_away = poisson_match_probabilities_single(
+            home_xg,
+            away_xg
+        )
+        
+
+        prob_dict = {
+            "H": p_home,
+            "D": p_draw,
+            "A": p_away
+        }
 
         prediction = max(
             prob_dict,
