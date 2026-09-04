@@ -119,6 +119,9 @@ features_v2 = joblib.load(
 football = pd.read_pickle(
     f"{project_path}/football_processed.pkl"
 )
+final_home_poisson = joblib.load("final_home_poisson.pkl")
+final_away_poisson = joblib.load("final_away_poisson.pkl")
+
 API_KEY = st.secrets["FOOTBALL_DATA_API_KEY"]
 
 headers = {
@@ -686,7 +689,58 @@ def get_prediction_type_counts():
             counts[result] += 1
 
     return counts
+    
+from scipy.stats import poisson
+import numpy as np
 
+
+def poisson_match_probabilities_single(
+    home_xg,
+    away_xg,
+    max_goals=10
+):
+    goals = np.arange(max_goals + 1)
+
+    home_pmf = poisson.pmf(
+        goals,
+        home_xg
+    )
+
+    away_pmf = poisson.pmf(
+        goals,
+        away_xg
+    )
+
+    matrix = np.outer(
+        home_pmf,
+        away_pmf
+    )
+
+    p_home = np.tril(
+        matrix,
+        -1
+    ).sum()
+
+    p_draw = np.trace(
+        matrix
+    )
+
+    p_away = np.triu(
+        matrix,
+        1
+    ).sum()
+
+    total = (
+        p_home +
+        p_draw +
+        p_away
+    )
+
+    return (
+        p_home / total,
+        p_draw / total,
+        p_away / total
+    )
 # ============================================================
 # BUILD ALL 28 FEATURES
 # ============================================================
